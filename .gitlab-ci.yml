@@ -1,0 +1,53 @@
+image: gitlab-registry.kkvesper.net/devops/docker-library/scala-sbt:2.12.6
+
+cache:
+  untracked: true
+
+stages:
+- build
+- test
+- publish
+
+build:
+  stage: build
+  script:
+  - sbt universal:packageZipTarball
+  - mkdir -p dist && cp $(find target/universal -type f -name 'general-etl-0.1.0-SNAPSHOT.tgz') ./dist/${CI_PROJECT_NAME}.tar.gz
+  artifacts:
+    paths:
+    - dist
+    expire_in: 1 day
+  tags:
+  - scala
+
+test:
+  stage: test
+  services:
+  - postgres:10.3
+  variables:
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: '5432'
+    POSTGRES_DB: models_test
+    POSTGRES_USER: postgres
+    SECRET_POSTGRES_PASSWORD: password
+  script:
+  - sbt coverage test coverageReport
+  coverage: '/Coverage was \[\d+.\d+\%\]/'
+  tags:
+  - scala
+
+publish:
+  stage: publish
+  image: gitlab-registry.kkvesper.net/devops/docker-library/publisher:latest
+  variables:
+    SNOWBALL_ENVIRONMENTS: staging production
+  script:
+  - snowball-s3-publish.sh
+  dependencies:
+  - build
+  only:
+  - develop@microservices/models-etl
+  - master@microservices/models-etl
+  - tags@microservices/models-etl
+  tags:
+  - docker

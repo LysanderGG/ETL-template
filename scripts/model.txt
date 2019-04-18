@@ -1,0 +1,3 @@
+{"event":"ModelCreated","version":1,"timestamp":"2018-01-31T00:00:00.000+09:00","data":"{...}"}
+{"event":"ModelUpdated","version":1,"timestamp":"2018-01-31T00:00:00.000+09:00","data":"{...}"}
+{"event":"ModelDestroyed","version":1,"timestamp":"2017-02-02T08:54:00.000Z","data":"{\"_id\":\"5be0f9bac3bf36247600000c\",\"deleted_at\":\"2017-02-02T17:54:00.000+09:00\"}"}
